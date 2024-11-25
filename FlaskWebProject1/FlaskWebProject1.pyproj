@@ -29,7 +29,6 @@
     <Compile Include="app.py" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="requirements.txt" />
     <Content Include="templates\form_submitted.html" />
   </ItemGroup>
   <ItemGroup>

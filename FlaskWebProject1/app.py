@@ -1,5 +1,7 @@
 from flask import Flask, request, render_template
-from transformers import pipeline
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+import requests
+import json
 
 app = Flask(__name__)
 
@@ -123,18 +125,40 @@ def submit():
     lstGenre = request.form.get('lstGenre')
     lstInstruments = request.form.getlist('lstInstruments')
     
-    # Initialize the Hugging Face text generation pipeline
-    generator = pipeline('text-generation', model='mistralai/Mixtral-8x7B-Instruct-v0.1', use_auth_token='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')
-
-    # Generate text using the Hugging Face model
-    prompt = f"Write a poem using words: {txtWords}"
-    response = generator(prompt, max_length=250, num_return_sequences=1)
+    # Generate text
+    prompt = f"Write a song using words: {txtWords}. Song genre is: {lstGenre}. Song will use instruments: {lstInstruments}."
     
-    generated_lyrics = response[0]['generated_text'].strip()
+    url = "https://api.x.ai/v1/chat/completions"
+    headers = {
+      "Authorization": "Bearer xai-P2VrBOBKw2Z2apm7eu5CA0s6ryOf9E32rNfnXVmmuafPvLWsX4G8eaXLBtgTvFd86kgMDyeyQ0JN1akK",
+      "Content-Type": "application/json"
+    }
+    data = {
+        "model": "grok-beta",
+        "messages": [
+        { "role": "user", "content": prompt }
+        ],
+        "temperature": 0,
+        "stream": False
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+
+    if response.status_code == 200:
+      print(response.json())
+    else:
+      print(response.text)
+    
+    # Check if the request was successful
+    if response.status_code == 200:
+        response_json = json.loads(response.text)
+        generated_lyrics = response_json['choices'][0]['message']['content'].strip()
+    else:
+        generated_lyrics = 'Error generating lyrics.'
 
     # Process the form data as needed
     return render_template('form_submitted.html', 
-                    generated_lyrics=generated_lyrics, txtWords=txtWords, lstGenre=lstGenre, lstInstruments=lstInstruments)
+                    txtPrompt=prompt, generated_lyrics=generated_lyrics, txtWords=txtWords, lstGenre=lstGenre, lstInstruments=lstInstruments)
 
 if __name__ == '__main__':
     import os
