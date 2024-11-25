@@ -1,5 +1,5 @@
-from flask import Flask, request, render_template
-from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+from flask import Flask, request
+from templates.song_form import render_song_form
 import requests
 import json
 
@@ -144,11 +144,6 @@ def submit():
 
     response = requests.post(url, headers=headers, json=data)
 
-    if response.status_code == 200:
-      print(response.json())
-    else:
-      print(response.text)
-    
     # Check if the request was successful
     if response.status_code == 200:
         response_json = json.loads(response.text)
@@ -157,8 +152,7 @@ def submit():
         generated_lyrics = 'Error generating lyrics.'
 
     # Process the form data as needed
-    return render_template('form_submitted.html', 
-                    txtPrompt=prompt, generated_lyrics=generated_lyrics, txtWords=txtWords, lstGenre=lstGenre, lstInstruments=lstInstruments)
+    return render_song_form(prompt, generated_lyrics, txtWords, lstGenre, lstInstruments)
 
 if __name__ == '__main__':
     import os

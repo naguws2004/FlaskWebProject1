@@ -29,7 +29,8 @@
     <Compile Include="app.py" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="templates\form_submitted.html" />
+    <Content Include="templates\song_form.py" />
+    <Content Include="templates\song.html" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="templates\" />
